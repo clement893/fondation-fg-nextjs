@@ -48,3 +48,8 @@
 - [ ] Configure Railway project
 - [ ] Setup PostgreSQL on Railway
 - [ ] Test production deployment
+
+## Homepage Simplification
+- [x] Remove all section content except first page
+- [x] Add animated line that follows horizontal scroll
+- [x] Keep minimal, elegant design
