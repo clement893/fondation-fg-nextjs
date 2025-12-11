@@ -7,6 +7,11 @@ export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [waveOffset, setWaveOffset] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,7 +31,6 @@ export default function HomePage() {
       setScrollProgress(progress);
       
       // Calculate wave offset based on scroll position
-      // This creates the up/down wave effect
       setWaveOffset(scrollLeft);
     };
 
@@ -41,12 +45,12 @@ export default function HomePage() {
 
   // Calculate wave vertical position using sine wave
   const getWaveY = () => {
+    if (!mounted || typeof window === 'undefined') return 50;
+    
     // Create a sine wave that oscillates as you scroll
-    // Frequency: how many waves across the screen
-    // Amplitude: how far up/down the wave goes
-    const frequency = 0.002; // Lower = wider waves
-    const amplitude = 80; // pixels up/down
-    const centerY = 50; // center at 50% of screen height
+    const frequency = 0.002;
+    const amplitude = 80;
+    const centerY = 50;
     
     return centerY + Math.sin(waveOffset * frequency) * (amplitude / window.innerHeight * 100);
   };
@@ -181,24 +185,26 @@ export default function HomePage() {
       </div>
 
       {/* Animated Vertical Wave Line */}
-      <div 
-        className="fixed left-0 h-2 z-40 pointer-events-none transition-all duration-100 ease-out"
-        style={{
-          top: `${getWaveY()}%`,
-          width: `${scrollProgress}%`,
-        }}
-      >
-        <div
-          className="wave-shimmer h-full rounded-full"
+      {mounted && (
+        <div 
+          className="fixed left-0 h-2 z-40 pointer-events-none transition-all duration-100 ease-out"
           style={{
-            boxShadow: `
-              0 0 20px rgba(59, 130, 246, 0.6),
-              0 0 40px rgba(147, 51, 234, 0.4),
-              0 0 60px rgba(236, 72, 153, 0.3)
-            `,
+            top: `${getWaveY()}%`,
+            width: `${scrollProgress}%`,
           }}
-        />
-      </div>
+        >
+          <div
+            className="wave-shimmer h-full rounded-full"
+            style={{
+              boxShadow: `
+                0 0 20px rgba(59, 130, 246, 0.6),
+                0 0 40px rgba(147, 51, 234, 0.4),
+                0 0 60px rgba(236, 72, 153, 0.3)
+              `,
+            }}
+          />
+        </div>
+      )}
 
       {/* Scroll Hint */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur border border-gray-200 rounded-full px-6 py-3 shadow-lg z-50 text-sm text-gray-600 animate-pulse">

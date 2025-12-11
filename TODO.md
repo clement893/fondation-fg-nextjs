@@ -67,3 +67,7 @@
 - [x] Create wave that moves up and down to pass over/under text
 - [x] Sync wave position with horizontal scroll
 - [x] Make wave flow smoothly across sections
+
+## SSR Fix
+- [x] Fix window is not defined error
+- [x] Add client-side only checks for window object
