@@ -77,3 +77,7 @@
 - [x] Add smoother transitions
 - [x] Increase wave frequency for more ondulations
 - [x] Add continuous animation for liveliness
+
+## Fix Choppy Animation
+- [x] Remove CSS transitions causing stuttering
+- [x] Use pure requestAnimationFrame for 60fps smoothness

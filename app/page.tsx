@@ -9,16 +9,32 @@ export default function HomePage() {
   const [waveOffset, setWaveOffset] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
+  const [waveY, setWaveY] = useState(50);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     
-    // Continuous animation for wave movement
     let animationFrame: number;
     let startTime = Date.now();
     
     const animate = () => {
-      setAnimationTime((Date.now() - startTime) / 1000);
+      const currentTime = (Date.now() - startTime) / 1000;
+      setAnimationTime(currentTime);
+      
+      // Calculate wave position with multiple sine waves
+      const baseWave = Math.sin(waveOffset * 0.003 + currentTime * 0.5) * 12;
+      const secondWave = Math.sin(waveOffset * 0.005 - currentTime * 0.3) * 8;
+      const thirdWave = Math.sin(waveOffset * 0.007 + currentTime * 0.7) * 5;
+      
+      const combinedWave = baseWave + secondWave + thirdWave;
+      const centerY = 50;
+      
+      setWaveY(centerY + combinedWave);
+      
       animationFrame = requestAnimationFrame(animate);
     };
     
@@ -29,7 +45,7 @@ export default function HomePage() {
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, []);
+  }, [mounted, waveOffset]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -58,21 +74,6 @@ export default function HomePage() {
       container.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  // Calculate wave vertical position with multiple sine waves for organic feel
-  const getWaveY = () => {
-    if (!mounted || typeof window === 'undefined') return 50;
-    
-    // Combine multiple sine waves for more organic movement
-    const baseWave = Math.sin(waveOffset * 0.003 + animationTime * 0.5) * 12;
-    const secondWave = Math.sin(waveOffset * 0.005 - animationTime * 0.3) * 8;
-    const thirdWave = Math.sin(waveOffset * 0.007 + animationTime * 0.7) * 5;
-    
-    const combinedWave = baseWave + secondWave + thirdWave;
-    const centerY = 50;
-    
-    return centerY + combinedWave;
-  };
 
   return (
     <div className="h-screen overflow-hidden bg-white">
@@ -214,12 +215,12 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Fluid Animated Wave Line */}
+      {/* Perfectly Smooth Wave Line - No CSS transitions */}
       {mounted && (
         <div 
-          className="fixed left-0 h-3 z-40 pointer-events-none transition-all duration-75 ease-out"
+          className="fixed left-0 h-3 z-40 pointer-events-none"
           style={{
-            top: `${getWaveY()}%`,
+            top: `${waveY}%`,
             width: `${scrollProgress}%`,
           }}
         >
