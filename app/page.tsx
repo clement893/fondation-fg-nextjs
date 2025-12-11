@@ -31,10 +31,10 @@ export default function HomePage() {
       const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
       setScrollProgress(progress);
       
-      // Calculate wave phase based on scroll delta (only when scrolling)
+      // Calculate wave phase based on scroll delta
       const scrollDelta = scrollLeft - lastScrollRef.current;
       if (Math.abs(scrollDelta) > 0) {
-        setWavePhase(prev => prev + scrollDelta * 0.01);
+        setWavePhase(prev => prev + scrollDelta * 0.015);
       }
       lastScrollRef.current = scrollLeft;
     };
@@ -48,20 +48,24 @@ export default function HomePage() {
     };
   }, []);
 
-  // Generate SVG path for ondulating line
-  const generateWavePath = () => {
+  // Generate ultra-smooth SVG path with multiple sine waves
+  const generateWavePath = (offset = 0, amplitudeMultiplier = 1) => {
     if (!mounted || typeof window === 'undefined') return '';
     
     const width = (window.innerWidth * scrollProgress) / 100;
     if (width === 0) return '';
     
-    const amplitude = 30; // Height of waves
-    const frequency = 0.01; // How many waves per pixel
+    const baseAmplitude = 25 * amplitudeMultiplier;
     const points: string[] = [];
     
-    // Generate smooth sine wave path
-    for (let x = 0; x <= width; x += 2) {
-      const y = Math.sin(x * frequency + wavePhase) * amplitude;
+    // Much higher density for ultra-smooth curves
+    for (let x = 0; x <= width; x += 0.5) {
+      // Combine multiple sine waves for organic, flowing movement
+      const wave1 = Math.sin(x * 0.008 + wavePhase + offset) * baseAmplitude;
+      const wave2 = Math.sin(x * 0.012 - wavePhase * 0.7 + offset) * (baseAmplitude * 0.5);
+      const wave3 = Math.sin(x * 0.015 + wavePhase * 1.3 + offset) * (baseAmplitude * 0.3);
+      
+      const y = wave1 + wave2 + wave3;
       points.push(`${x},${y}`);
     }
     
@@ -81,24 +85,49 @@ export default function HomePage() {
           -ms-overflow-style: none;
         }
 
-        @keyframes shimmer {
-          0% {
-            stroke-dashoffset: 2000;
+        @keyframes holographic-shift {
+          0%, 100% {
+            stop-color: rgb(59, 130, 246);
           }
-          100% {
-            stroke-dashoffset: 0;
+          33% {
+            stop-color: rgb(147, 51, 234);
+          }
+          66% {
+            stop-color: rgb(236, 72, 153);
           }
         }
 
-        .wave-path {
-          stroke: url(#waveGradient);
+        .wave-layer-1 {
+          stroke: url(#waveGradient1);
+          stroke-width: 5;
+          fill: none;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.8))
+                  drop-shadow(0 0 30px rgba(147, 51, 234, 0.5));
+          opacity: 0.9;
+        }
+
+        .wave-layer-2 {
+          stroke: url(#waveGradient2);
           stroke-width: 4;
           fill: none;
           stroke-linecap: round;
           stroke-linejoin: round;
-          filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6))
-                  drop-shadow(0 0 20px rgba(147, 51, 234, 0.4))
-                  drop-shadow(0 0 30px rgba(236, 72, 153, 0.3));
+          filter: drop-shadow(0 0 12px rgba(147, 51, 234, 0.7))
+                  drop-shadow(0 0 25px rgba(236, 72, 153, 0.4));
+          opacity: 0.7;
+        }
+
+        .wave-layer-3 {
+          stroke: url(#waveGradient3);
+          stroke-width: 3;
+          fill: none;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.6))
+                  drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+          opacity: 0.5;
         }
       `}</style>
 
@@ -143,7 +172,7 @@ export default function HomePage() {
         ref={containerRef}
         className="scroll-container h-full pt-16 overflow-x-auto overflow-y-hidden"
       >
-        {/* Horizontal content - 5 sections - All white background */}
+        {/* Horizontal content - 5 sections */}
         <div className="h-full flex">
           {/* Section 1 - Hero */}
           <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-white px-6">
@@ -195,29 +224,57 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Ondulating SVG Wave Line */}
+      {/* Ultra-Smooth Holographic Wave - Multiple Layers */}
       {mounted && scrollProgress > 0 && (
         <svg
           className="fixed top-1/2 left-0 pointer-events-none z-40"
           style={{
             width: '100%',
-            height: '200px',
+            height: '300px',
             transform: 'translateY(-50%)',
           }}
         >
           <defs>
-            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgb(59, 130, 246)" stopOpacity="0.9" />
-              <stop offset="25%" stopColor="rgb(99, 102, 241)" stopOpacity="1" />
-              <stop offset="50%" stopColor="rgb(147, 51, 234)" stopOpacity="1" />
-              <stop offset="75%" stopColor="rgb(236, 72, 153)" stopOpacity="1" />
-              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="0.9" />
+            {/* Gradient for layer 1 */}
+            <linearGradient id="waveGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(59, 130, 246)" stopOpacity="1" />
+              <stop offset="33%" stopColor="rgb(99, 102, 241)" stopOpacity="1" />
+              <stop offset="66%" stopColor="rgb(147, 51, 234)" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="1" />
+            </linearGradient>
+            
+            {/* Gradient for layer 2 */}
+            <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(147, 51, 234)" stopOpacity="1" />
+              <stop offset="50%" stopColor="rgb(219, 39, 119)" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgb(236, 72, 153)" stopOpacity="1" />
+            </linearGradient>
+            
+            {/* Gradient for layer 3 */}
+            <linearGradient id="waveGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(236, 72, 153)" stopOpacity="1" />
+              <stop offset="50%" stopColor="rgb(99, 102, 241)" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="1" />
             </linearGradient>
           </defs>
-          <g transform="translate(0, 100)">
+          
+          <g transform="translate(0, 150)">
+            {/* Layer 1 - Main wave */}
             <path
-              className="wave-path"
-              d={generateWavePath()}
+              className="wave-layer-1"
+              d={generateWavePath(0, 1)}
+            />
+            
+            {/* Layer 2 - Secondary wave */}
+            <path
+              className="wave-layer-2"
+              d={generateWavePath(Math.PI / 3, 0.8)}
+            />
+            
+            {/* Layer 3 - Tertiary wave */}
+            <path
+              className="wave-layer-3"
+              d={generateWavePath(Math.PI / 1.5, 0.6)}
             />
           </g>
         </svg>
