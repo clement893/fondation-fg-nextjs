@@ -36,6 +36,31 @@ export default function HomePage() {
 
   return (
     <div className="h-screen overflow-hidden bg-white">
+      {/* Wave Animation Keyframes */}
+      <style jsx global>{`
+        @keyframes wave {
+          0% {
+            transform: translateY(0) scaleY(1);
+          }
+          25% {
+            transform: translateY(-3px) scaleY(1.5);
+          }
+          50% {
+            transform: translateY(0) scaleY(1);
+          }
+          75% {
+            transform: translateY(3px) scaleY(1.5);
+          }
+          100% {
+            transform: translateY(0) scaleY(1);
+          }
+        }
+
+        .wave-line {
+          animation: wave 2s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Top Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 h-16 border-b bg-white/95 backdrop-blur z-50 flex items-center justify-between px-6">
         <Link href="/">
@@ -87,7 +112,7 @@ export default function HomePage() {
           }
         `}</style>
 
-        {/* Horizontal content - 5 sections */}
+        {/* Horizontal content - 5 sections - All white background */}
         <div className="h-full flex">
           {/* Section 1 - Hero */}
           <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-white px-6">
@@ -102,7 +127,7 @@ export default function HomePage() {
           </section>
 
           {/* Section 2 */}
-          <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-gray-50 px-6">
+          <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-white px-6">
             <div className="max-w-4xl text-center">
               <h2 className="text-4xl md:text-6xl font-bold text-gray-900">
                 2010
@@ -120,7 +145,7 @@ export default function HomePage() {
           </section>
 
           {/* Section 4 */}
-          <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-gray-50 px-6">
+          <section className="min-w-full h-full flex-shrink-0 flex items-center justify-center bg-white px-6">
             <div className="max-w-4xl text-center">
               <h2 className="text-4xl md:text-6xl font-bold text-gray-900">
                 2020
@@ -139,13 +164,13 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Animated Progress Line */}
-      <div className="fixed top-1/2 left-0 right-0 h-0.5 bg-gray-200 z-40 pointer-events-none">
+      {/* Animated Wave Line */}
+      <div className="fixed top-1/2 left-0 right-0 h-1 bg-gray-100 z-40 pointer-events-none overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-out"
+          className="wave-line h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-out origin-left"
           style={{
             width: `${scrollProgress}%`,
-            boxShadow: `0 0 20px rgba(59, 130, 246, 0.5)`,
+            boxShadow: `0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(168, 85, 247, 0.4)`,
           }}
         />
       </div>
