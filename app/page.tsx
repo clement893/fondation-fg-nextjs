@@ -36,7 +36,7 @@ export default function HomePage() {
 
   return (
     <div className="h-screen overflow-hidden bg-white">
-      {/* Wave Animation Keyframes */}
+      {/* All CSS in one style block */}
       <style jsx global>{`
         @keyframes wave {
           0% {
@@ -58,6 +58,15 @@ export default function HomePage() {
 
         .wave-line {
           animation: wave 2s ease-in-out infinite;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+
+        .scroll-container {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
       `}</style>
 
@@ -100,18 +109,8 @@ export default function HomePage() {
       {/* Horizontal Scroll Container */}
       <div
         ref={containerRef}
-        className="h-full pt-16 overflow-x-auto overflow-y-hidden"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
+        className="scroll-container h-full pt-16 overflow-x-auto overflow-y-hidden"
       >
-        <style jsx>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-
         {/* Horizontal content - 5 sections - All white background */}
         <div className="h-full flex">
           {/* Section 1 - Hero */}
