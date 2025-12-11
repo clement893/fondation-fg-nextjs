@@ -8,9 +8,27 @@ export default function HomePage() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [waveOffset, setWaveOffset] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [animationTime, setAnimationTime] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Continuous animation for wave movement
+    let animationFrame: number;
+    let startTime = Date.now();
+    
+    const animate = () => {
+      setAnimationTime((Date.now() - startTime) / 1000);
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -29,8 +47,6 @@ export default function HomePage() {
       const maxScroll = container.scrollWidth - container.clientWidth;
       const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
       setScrollProgress(progress);
-      
-      // Calculate wave offset based on scroll position
       setWaveOffset(scrollLeft);
     };
 
@@ -43,16 +59,19 @@ export default function HomePage() {
     };
   }, []);
 
-  // Calculate wave vertical position using sine wave
+  // Calculate wave vertical position with multiple sine waves for organic feel
   const getWaveY = () => {
     if (!mounted || typeof window === 'undefined') return 50;
     
-    // Create a sine wave that oscillates as you scroll
-    const frequency = 0.002;
-    const amplitude = 80;
+    // Combine multiple sine waves for more organic movement
+    const baseWave = Math.sin(waveOffset * 0.003 + animationTime * 0.5) * 12;
+    const secondWave = Math.sin(waveOffset * 0.005 - animationTime * 0.3) * 8;
+    const thirdWave = Math.sin(waveOffset * 0.007 + animationTime * 0.7) * 5;
+    
+    const combinedWave = baseWave + secondWave + thirdWave;
     const centerY = 50;
     
-    return centerY + Math.sin(waveOffset * frequency) * (amplitude / window.innerHeight * 100);
+    return centerY + combinedWave;
   };
 
   return (
@@ -70,24 +89,35 @@ export default function HomePage() {
 
         @keyframes shimmer {
           0% {
-            background-position: -1000px 0;
+            background-position: -2000px 0;
           }
           100% {
-            background-position: 1000px 0;
+            background-position: 2000px 0;
+          }
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% {
+            filter: brightness(1) saturate(1);
+          }
+          50% {
+            filter: brightness(1.2) saturate(1.3);
           }
         }
 
         .wave-shimmer {
           background: linear-gradient(
             90deg,
-            rgba(59, 130, 246, 0.8) 0%,
-            rgba(147, 51, 234, 1) 25%,
-            rgba(236, 72, 153, 0.8) 50%,
-            rgba(147, 51, 234, 1) 75%,
-            rgba(59, 130, 246, 0.8) 100%
+            rgba(59, 130, 246, 0.9) 0%,
+            rgba(99, 102, 241, 1) 15%,
+            rgba(147, 51, 234, 1) 30%,
+            rgba(219, 39, 119, 1) 50%,
+            rgba(236, 72, 153, 0.9) 65%,
+            rgba(147, 51, 234, 1) 80%,
+            rgba(59, 130, 246, 0.9) 100%
           );
-          background-size: 2000px 100%;
-          animation: shimmer 3s linear infinite;
+          background-size: 4000px 100%;
+          animation: shimmer 6s linear infinite, pulse-glow 3s ease-in-out infinite;
         }
       `}</style>
 
@@ -184,10 +214,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Animated Vertical Wave Line */}
+      {/* Fluid Animated Wave Line */}
       {mounted && (
         <div 
-          className="fixed left-0 h-2 z-40 pointer-events-none transition-all duration-100 ease-out"
+          className="fixed left-0 h-3 z-40 pointer-events-none transition-all duration-75 ease-out"
           style={{
             top: `${getWaveY()}%`,
             width: `${scrollProgress}%`,
@@ -197,9 +227,10 @@ export default function HomePage() {
             className="wave-shimmer h-full rounded-full"
             style={{
               boxShadow: `
-                0 0 20px rgba(59, 130, 246, 0.6),
-                0 0 40px rgba(147, 51, 234, 0.4),
-                0 0 60px rgba(236, 72, 153, 0.3)
+                0 0 30px rgba(59, 130, 246, 0.7),
+                0 0 60px rgba(147, 51, 234, 0.5),
+                0 0 90px rgba(236, 72, 153, 0.3),
+                0 0 120px rgba(99, 102, 241, 0.2)
               `,
             }}
           />

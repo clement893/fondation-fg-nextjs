@@ -71,3 +71,9 @@
 ## SSR Fix
 - [x] Fix window is not defined error
 - [x] Add client-side only checks for window object
+
+## Fluid Wave Enhancement
+- [x] Make wave more fluid and organic
+- [x] Add smoother transitions
+- [x] Increase wave frequency for more ondulations
+- [x] Add continuous animation for liveliness
