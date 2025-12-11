@@ -5,17 +5,17 @@
 - [x] Install Tailwind CSS 4
 - [x] Install Drizzle ORM and PostgreSQL
 - [x] Install NextAuth.js
-- [ ] Configure environment variables
-- [ ] Setup database schema
+- [x] Configure environment variables
+- [x] Setup database schema
 - [ ] Configure NextAuth.js
 
 ## Homepage with Horizontal Scroll
-- [ ] Create smooth horizontal scroll with mouse wheel
-- [ ] Implement timeline sections (2010-2024)
-- [ ] Add hero section
-- [ ] Add progress indicator
-- [ ] Add statistics cards
-- [ ] Optimize scroll performance
+- [x] Create smooth horizontal scroll with mouse wheel
+- [x] Implement timeline sections (2010-2024)
+- [x] Add hero section
+- [x] Add progress indicator
+- [x] Add statistics cards
+- [x] Optimize scroll performance
 
 ## Database & Backend
 - [ ] Create articles table schema
@@ -42,9 +42,9 @@
 - [ ] Create Contact page with form
 
 ## Deployment
-- [ ] Create GitHub repository
-- [ ] Setup GitHub Actions for linting
-- [ ] Setup GitHub Actions for Railway deployment
+- [x] Create GitHub repository
+- [x] Setup GitHub Actions for linting
+- [x] Setup GitHub Actions for Railway deployment
 - [ ] Configure Railway project
 - [ ] Setup PostgreSQL on Railway
 - [ ] Test production deployment
