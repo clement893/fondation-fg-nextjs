@@ -62,3 +62,8 @@
 ## Build Error Fix
 - [x] Fix nested styled-jsx tags error
 - [x] Merge all CSS into single style block
+
+## Vertical Wave Animation
+- [x] Create wave that moves up and down to pass over/under text
+- [x] Sync wave position with horizontal scroll
+- [x] Make wave flow smoothly across sections

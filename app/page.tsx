@@ -6,6 +6,7 @@ import Link from "next/link";
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [waveOffset, setWaveOffset] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -17,12 +18,16 @@ export default function HomePage() {
       container.scrollLeft += e.deltaY;
     };
 
-    // Update scroll progress
+    // Update scroll progress and wave offset
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
       const maxScroll = container.scrollWidth - container.clientWidth;
       const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
       setScrollProgress(progress);
+      
+      // Calculate wave offset based on scroll position
+      // This creates the up/down wave effect
+      setWaveOffset(scrollLeft);
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
@@ -34,32 +39,22 @@ export default function HomePage() {
     };
   }, []);
 
+  // Calculate wave vertical position using sine wave
+  const getWaveY = () => {
+    // Create a sine wave that oscillates as you scroll
+    // Frequency: how many waves across the screen
+    // Amplitude: how far up/down the wave goes
+    const frequency = 0.002; // Lower = wider waves
+    const amplitude = 80; // pixels up/down
+    const centerY = 50; // center at 50% of screen height
+    
+    return centerY + Math.sin(waveOffset * frequency) * (amplitude / window.innerHeight * 100);
+  };
+
   return (
     <div className="h-screen overflow-hidden bg-white">
-      {/* All CSS in one style block */}
+      {/* CSS Styles */}
       <style jsx global>{`
-        @keyframes wave {
-          0% {
-            transform: translateY(0) scaleY(1);
-          }
-          25% {
-            transform: translateY(-3px) scaleY(1.5);
-          }
-          50% {
-            transform: translateY(0) scaleY(1);
-          }
-          75% {
-            transform: translateY(3px) scaleY(1.5);
-          }
-          100% {
-            transform: translateY(0) scaleY(1);
-          }
-        }
-
-        .wave-line {
-          animation: wave 2s ease-in-out infinite;
-        }
-
         .scroll-container::-webkit-scrollbar {
           display: none;
         }
@@ -67,6 +62,28 @@ export default function HomePage() {
         .scroll-container {
           scrollbar-width: none;
           -ms-overflow-style: none;
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: -1000px 0;
+          }
+          100% {
+            background-position: 1000px 0;
+          }
+        }
+
+        .wave-shimmer {
+          background: linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0.8) 0%,
+            rgba(147, 51, 234, 1) 25%,
+            rgba(236, 72, 153, 0.8) 50%,
+            rgba(147, 51, 234, 1) 75%,
+            rgba(59, 130, 246, 0.8) 100%
+          );
+          background-size: 2000px 100%;
+          animation: shimmer 3s linear infinite;
         }
       `}</style>
 
@@ -163,13 +180,22 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Animated Wave Line */}
-      <div className="fixed top-1/2 left-0 right-0 h-1 bg-gray-100 z-40 pointer-events-none overflow-hidden">
+      {/* Animated Vertical Wave Line */}
+      <div 
+        className="fixed left-0 h-2 z-40 pointer-events-none transition-all duration-100 ease-out"
+        style={{
+          top: `${getWaveY()}%`,
+          width: `${scrollProgress}%`,
+        }}
+      >
         <div
-          className="wave-line h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-out origin-left"
+          className="wave-shimmer h-full rounded-full"
           style={{
-            width: `${scrollProgress}%`,
-            boxShadow: `0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(168, 85, 247, 0.4)`,
+            boxShadow: `
+              0 0 20px rgba(59, 130, 246, 0.6),
+              0 0 40px rgba(147, 51, 234, 0.4),
+              0 0 60px rgba(236, 72, 153, 0.3)
+            `,
           }}
         />
       </div>
