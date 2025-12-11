@@ -6,46 +6,13 @@ import Link from "next/link";
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [waveOffset, setWaveOffset] = useState(0);
+  const [wavePhase, setWavePhase] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const [animationTime, setAnimationTime] = useState(0);
-  const [waveY, setWaveY] = useState(50);
+  const lastScrollRef = useRef(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
-    let animationFrame: number;
-    let startTime = Date.now();
-    
-    const animate = () => {
-      const currentTime = (Date.now() - startTime) / 1000;
-      setAnimationTime(currentTime);
-      
-      // Calculate wave position with multiple sine waves
-      const baseWave = Math.sin(waveOffset * 0.003 + currentTime * 0.5) * 12;
-      const secondWave = Math.sin(waveOffset * 0.005 - currentTime * 0.3) * 8;
-      const thirdWave = Math.sin(waveOffset * 0.007 + currentTime * 0.7) * 5;
-      
-      const combinedWave = baseWave + secondWave + thirdWave;
-      const centerY = 50;
-      
-      setWaveY(centerY + combinedWave);
-      
-      animationFrame = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
-  }, [mounted, waveOffset]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -57,13 +24,19 @@ export default function HomePage() {
       container.scrollLeft += e.deltaY;
     };
 
-    // Update scroll progress and wave offset
+    // Update scroll progress and wave phase
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
       const maxScroll = container.scrollWidth - container.clientWidth;
       const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
       setScrollProgress(progress);
-      setWaveOffset(scrollLeft);
+      
+      // Calculate wave phase based on scroll delta (only when scrolling)
+      const scrollDelta = scrollLeft - lastScrollRef.current;
+      if (Math.abs(scrollDelta) > 0) {
+        setWavePhase(prev => prev + scrollDelta * 0.01);
+      }
+      lastScrollRef.current = scrollLeft;
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
@@ -74,6 +47,26 @@ export default function HomePage() {
       container.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Generate SVG path for ondulating line
+  const generateWavePath = () => {
+    if (!mounted || typeof window === 'undefined') return '';
+    
+    const width = (window.innerWidth * scrollProgress) / 100;
+    if (width === 0) return '';
+    
+    const amplitude = 30; // Height of waves
+    const frequency = 0.01; // How many waves per pixel
+    const points: string[] = [];
+    
+    // Generate smooth sine wave path
+    for (let x = 0; x <= width; x += 2) {
+      const y = Math.sin(x * frequency + wavePhase) * amplitude;
+      points.push(`${x},${y}`);
+    }
+    
+    return `M ${points.join(' L ')}`;
+  };
 
   return (
     <div className="h-screen overflow-hidden bg-white">
@@ -90,35 +83,22 @@ export default function HomePage() {
 
         @keyframes shimmer {
           0% {
-            background-position: -2000px 0;
+            stroke-dashoffset: 2000;
           }
           100% {
-            background-position: 2000px 0;
+            stroke-dashoffset: 0;
           }
         }
 
-        @keyframes pulse-glow {
-          0%, 100% {
-            filter: brightness(1) saturate(1);
-          }
-          50% {
-            filter: brightness(1.2) saturate(1.3);
-          }
-        }
-
-        .wave-shimmer {
-          background: linear-gradient(
-            90deg,
-            rgba(59, 130, 246, 0.9) 0%,
-            rgba(99, 102, 241, 1) 15%,
-            rgba(147, 51, 234, 1) 30%,
-            rgba(219, 39, 119, 1) 50%,
-            rgba(236, 72, 153, 0.9) 65%,
-            rgba(147, 51, 234, 1) 80%,
-            rgba(59, 130, 246, 0.9) 100%
-          );
-          background-size: 4000px 100%;
-          animation: shimmer 6s linear infinite, pulse-glow 3s ease-in-out infinite;
+        .wave-path {
+          stroke: url(#waveGradient);
+          stroke-width: 4;
+          fill: none;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.6))
+                  drop-shadow(0 0 20px rgba(147, 51, 234, 0.4))
+                  drop-shadow(0 0 30px rgba(236, 72, 153, 0.3));
         }
       `}</style>
 
@@ -215,27 +195,32 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Perfectly Smooth Wave Line - No CSS transitions */}
-      {mounted && (
-        <div 
-          className="fixed left-0 h-3 z-40 pointer-events-none"
+      {/* Ondulating SVG Wave Line */}
+      {mounted && scrollProgress > 0 && (
+        <svg
+          className="fixed top-1/2 left-0 pointer-events-none z-40"
           style={{
-            top: `${waveY}%`,
-            width: `${scrollProgress}%`,
+            width: '100%',
+            height: '200px',
+            transform: 'translateY(-50%)',
           }}
         >
-          <div
-            className="wave-shimmer h-full rounded-full"
-            style={{
-              boxShadow: `
-                0 0 30px rgba(59, 130, 246, 0.7),
-                0 0 60px rgba(147, 51, 234, 0.5),
-                0 0 90px rgba(236, 72, 153, 0.3),
-                0 0 120px rgba(99, 102, 241, 0.2)
-              `,
-            }}
-          />
-        </div>
+          <defs>
+            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(59, 130, 246)" stopOpacity="0.9" />
+              <stop offset="25%" stopColor="rgb(99, 102, 241)" stopOpacity="1" />
+              <stop offset="50%" stopColor="rgb(147, 51, 234)" stopOpacity="1" />
+              <stop offset="75%" stopColor="rgb(236, 72, 153)" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgb(59, 130, 246)" stopOpacity="0.9" />
+            </linearGradient>
+          </defs>
+          <g transform="translate(0, 100)">
+            <path
+              className="wave-path"
+              d={generateWavePath()}
+            />
+          </g>
+        </svg>
       )}
 
       {/* Scroll Hint */}

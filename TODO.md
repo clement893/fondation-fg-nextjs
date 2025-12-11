@@ -81,3 +81,9 @@
 ## Fix Choppy Animation
 - [x] Remove CSS transitions causing stuttering
 - [x] Use pure requestAnimationFrame for 60fps smoothness
+
+## Ondulating Line Animation
+- [x] Create wavy/sinusoidal line shape (not straight)
+- [x] Line stays static when not scrolling
+- [x] Wave propagates forward only when scrolling
+- [x] Use SVG path for smooth wave shape
