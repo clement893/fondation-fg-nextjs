@@ -93,3 +93,9 @@
 - [x] Increase point density for smoother curves
 - [x] Add holographic color effect
 - [x] Combine multiple sine waves for organic flow
+
+## Burger Menu
+- [x] Hide current navigation menu
+- [x] Add burger button to header
+- [x] Create full-screen menu overlay
+- [x] Add open/close animations

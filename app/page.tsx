@@ -8,6 +8,7 @@ export default function HomePage() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [wavePhase, setWavePhase] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const lastScrollRef = useRef(0);
 
   useEffect(() => {
@@ -85,18 +86,6 @@ export default function HomePage() {
           -ms-overflow-style: none;
         }
 
-        @keyframes holographic-shift {
-          0%, 100% {
-            stop-color: rgb(59, 130, 246);
-          }
-          33% {
-            stop-color: rgb(147, 51, 234);
-          }
-          66% {
-            stop-color: rgb(236, 72, 153);
-          }
-        }
-
         .wave-layer-1 {
           stroke: url(#waveGradient1);
           stroke-width: 5;
@@ -129,6 +118,22 @@ export default function HomePage() {
                   drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
           opacity: 0.5;
         }
+
+        .burger-line {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .burger-open .line-1 {
+          transform: translateY(8px) rotate(45deg);
+        }
+
+        .burger-open .line-2 {
+          opacity: 0;
+        }
+
+        .burger-open .line-3 {
+          transform: translateY(-8px) rotate(-45deg);
+        }
       `}</style>
 
       {/* Top Navigation Bar */}
@@ -139,33 +144,67 @@ export default function HomePage() {
           </h1>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Burger Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className={`w-10 h-10 flex flex-col items-center justify-center gap-2 ${menuOpen ? 'burger-open' : ''}`}
+          aria-label="Toggle menu"
+        >
+          <span className="burger-line line-1 w-6 h-0.5 bg-gray-900 block"></span>
+          <span className="burger-line line-2 w-6 h-0.5 bg-gray-900 block"></span>
+          <span className="burger-line line-3 w-6 h-0.5 bg-gray-900 block"></span>
+        </button>
+      </header>
+
+      {/* Full-Screen Menu Overlay */}
+      <div
+        className={`fixed inset-0 bg-white z-40 flex items-center justify-center transition-all duration-500 ease-in-out ${
+          menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
+      >
+        <nav className="flex flex-col items-center gap-8">
           <Link
             href="/about"
-            className="text-sm font-medium cursor-pointer hover:text-blue-600 transition-colors text-gray-700"
+            onClick={() => setMenuOpen(false)}
+            className={`text-5xl md:text-7xl font-bold text-gray-900 hover:text-blue-600 transition-all duration-300 ${
+              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ transitionDelay: menuOpen ? '100ms' : '0ms' }}
           >
             About
           </Link>
           <Link
             href="/articles"
-            className="text-sm font-medium cursor-pointer hover:text-blue-600 transition-colors text-gray-700"
+            onClick={() => setMenuOpen(false)}
+            className={`text-5xl md:text-7xl font-bold text-gray-900 hover:text-purple-600 transition-all duration-300 ${
+              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ transitionDelay: menuOpen ? '200ms' : '0ms' }}
           >
             Articles
           </Link>
           <Link
             href="/events"
-            className="text-sm font-medium cursor-pointer hover:text-blue-600 transition-colors text-gray-700"
+            onClick={() => setMenuOpen(false)}
+            className={`text-5xl md:text-7xl font-bold text-gray-900 hover:text-pink-600 transition-all duration-300 ${
+              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ transitionDelay: menuOpen ? '300ms' : '0ms' }}
           >
             Events
           </Link>
           <Link
             href="/contact"
-            className="text-sm font-medium cursor-pointer hover:text-blue-600 transition-colors text-gray-700"
+            onClick={() => setMenuOpen(false)}
+            className={`text-5xl md:text-7xl font-bold text-gray-900 hover:text-indigo-600 transition-all duration-300 ${
+              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ transitionDelay: menuOpen ? '400ms' : '0ms' }}
           >
             Contact
           </Link>
         </nav>
-      </header>
+      </div>
 
       {/* Horizontal Scroll Container */}
       <div
